@@ -22,14 +22,8 @@ export default function Goty({ games }: Props) {
             <h1>Kotti's Game of the Year list</h1>
 
             <div className='row gx-3'>
-              <a href='https://www.youtube.com/thekotti' target='_blank' rel='noreferrer' className='col'>
-                <Icon type='youtube' size={32} />
-              </a>
-              <a href='https://www.twitch.tv/thekotti' target='_blank' rel='noreferrer' className='col'>
+              <a href='https://www.twitch.tv/suimachine' target='_blank' rel='noreferrer' className='col'>
                 <Icon type='twitch' size={32} />
-              </a>
-              <a href='https://twitter.com/TheKotti' target='_blank' rel='noreferrer' className='col'>
-                <Icon type='twitter' size={32} />
               </a>
               <a href='https://discord.gg/thekotti' target='_blank' rel='noreferrer' className='col'>
                 <Icon type='discord' size={32} />
