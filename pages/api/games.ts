@@ -2,6 +2,7 @@ import axios from 'axios'
 import { Session, getServerSession } from 'next-auth'
 import authOptions from './auth/[...nextauth]'
 import { v2 as cloudinary } from 'cloudinary'
+import { log } from 'console'
 
 const { connectToDatabase } = require('../../lib/mongo')
 const ObjectId = require('mongodb').ObjectId
@@ -36,11 +37,18 @@ export default async function handler(req, res) {
 async function getGames(req, res) {
   try {
     // connect to the database
+    log("Kurwa 1")
     const { db } = await connectToDatabase()
+    log("Kurwa 2")
+
     // fetch the games
     const games = await db.collection('games').find({}).sort({ published: -1 }).toArray()
+    log("Kurwa 3")
+
     // return the games
     const parsedGames = JSON.parse(JSON.stringify(games))
+    log("Kurwa 4")
+
     return res.json(parsedGames)
   } catch (error: any) {
     // return the error
