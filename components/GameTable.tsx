@@ -40,7 +40,7 @@ export const GameTable = ({ games, isAdmin }: Props) => {
           stealth: x.stealth,
           igdbUrl: x.igdbUrl,
           releaseYear: x.releaseYear,
-          //vods: x.vods,
+          vods: x.vods,
           coverImageId: x.coverImageId,
         }
       })
