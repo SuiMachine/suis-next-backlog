@@ -40,7 +40,7 @@ export const GameTable = ({ games, isAdmin }: Props) => {
           stealth: x.stealth,
           igdbUrl: x.igdbUrl,
           releaseYear: x.releaseYear,
-          vods: x.vods,
+          //vods: x.vods,
           coverImageId: x.coverImageId,
         }
       })
@@ -223,8 +223,9 @@ export const GameTable = ({ games, isAdmin }: Props) => {
           <button className={`btn ${styles['dark-input']}`} onClick={() => setPageSize(50)} disabled={pageSize === 50}>
             {'Show 50'}
           </button>
-        </div>
-      </div>
-    </>
+		</div>
+	</div>
+	<div className='align-items-center'><br />Powered by <a href="https://github.com/TheKotti/next-backlog">Kotti's Backlog</a> script that I have butchered myself.</div>
+  </>
   )
 }

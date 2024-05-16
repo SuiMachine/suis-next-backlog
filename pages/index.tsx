@@ -30,22 +30,19 @@ export default function Home({ games }: Props) {
   return (
     <div>
       <Head>
-        <title>YAME! YAME!</title>
+        <title>Sui's backlog... oh nej!</title>
       </Head>
 
       <main>
         <div className={styles.container}>
           <div className='d-flex justify-content-between'>
-            <h1>?</h1>
+            <h1>Sui's sad little backlog</h1>
 
             <div className='row gx-3'>
               <a href='https://www.twitch.tv/suimachine' target='_blank' rel='noreferrer' className='col'>
                 <Icon type='twitch' size={32} />
               </a>
-              <a href='https://bsky.app/profile/thekotti.bsky.social' target='_blank' rel='noreferrer' className='col'>
-                <Icon type='twitter' size={32} />
-              </a>
-              <a href='https://discord.gg/thekotti' target='_blank' rel='noreferrer' className='col'>
+              <a href='https://discord.gg/FvJ5dXctFQ' target='_blank' rel='noreferrer' className='col'>
                 <Icon type='discord' size={32} />
               </a>
             </div>

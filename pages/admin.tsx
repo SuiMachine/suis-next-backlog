@@ -35,7 +35,7 @@ export default function Home({ isAdmin, username }: Props) {
   return (
     <div>
       <Head>
-        <title>YAME! YAME!</title>
+        <title>Sui's backlog... oh nej!</title>
       </Head>
 
       <Nav isAdmin={isAdmin} username={username} />

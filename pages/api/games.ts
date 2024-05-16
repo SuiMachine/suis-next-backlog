@@ -137,7 +137,7 @@ async function addGame(req, res) {
           rating: rating || null,
           platform,
           streamed,
-          vods: null,
+          //vods: null,
         }
         // connect to the database
         let { db } = await connectToDatabase()

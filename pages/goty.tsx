@@ -13,19 +13,19 @@ export default function Goty({ games }: Props) {
   return (
     <div>
       <Head>
-        <title>YAME! YAME!</title>
+        <title>Sui's backlog... goty... even worse</title>
       </Head>
 
       <main>
         <div className={styles.container}>
           <div className='d-flex justify-content-between'>
-            <h1>Kotti's Game of the Year list</h1>
+            <h1>Sui's Game of the Year list</h1>
 
             <div className='row gx-3'>
               <a href='https://www.twitch.tv/suimachine' target='_blank' rel='noreferrer' className='col'>
                 <Icon type='twitch' size={32} />
               </a>
-              <a href='https://discord.gg/thekotti' target='_blank' rel='noreferrer' className='col'>
+              <a href='https://discord.gg/FvJ5dXctFQ' target='_blank' rel='noreferrer' className='col'>
                 <Icon type='discord' size={32} />
               </a>
             </div>
