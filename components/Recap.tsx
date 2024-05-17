@@ -65,17 +65,6 @@ export const Recap = (props: Props) => {
               className='p-2'
             ></textarea>
           </div>
-
-          <div className={styles.feltSneaky}>
-            <label>Felt sneaky</label>
-            <div className={`${styles.checkbox}`} onClick={() => setGame({ ...game, stealth: !game.stealth })}>
-              {!!game?.stealth ? (
-                <div className={`d-flex align-items-center justify-content-center ${styles.checked}`} />
-              ) : (
-                <div className={styles.unchecked} />
-              )}
-            </div>
-          </div>
         </div>
 
         <div className={styles.comment}>

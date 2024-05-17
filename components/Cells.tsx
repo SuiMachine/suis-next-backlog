@@ -8,12 +8,9 @@ import styles from '../styles/GameTable.module.css'
 import CoverImage from './CoverImage'
 
 export const CommentCell = ({ value, row }) => {
-  const valueWithStealth = row.original.stealth
-    ? value + `\n- Sneaky <span class=${styles['color-icon']}>✔️</span>`
-    : value
   return (
     <span
-      dangerouslySetInnerHTML={{ __html: valueWithStealth.replace(/\n/g, `<div class="${styles['br-div']}"></div>`) }}
+      dangerouslySetInnerHTML={{ __html: value.replace(/\n/g, `<div class="${styles['br-div']}"></div>`) }}
     ></span>
   )
 }

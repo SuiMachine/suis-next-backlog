@@ -88,22 +88,11 @@ export const GameTable = ({ games, isAdmin }: Props) => {
   // On load set stuff from query parameters
   useEffect(() => {
     if (paramsLoaded) {
-      params.sneaky === 'true' && setStealthFilter(true)
       params.title && setTitleFilter(params.title as string)
       params.sortBy && setSortBy([{ id: params.sortBy as string, desc: params.sortDesc === 'true' ? true : false }])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paramsLoaded])
-
-  const handleStealthFilterChange = (checked) => {
-    setStealthFilter(checked)
-    if (checked) {
-      updateParams({ ...params, sneaky: checked })
-    } else {
-      delete params.sneaky
-      updateParams({ ...params })
-    }
-  }
 
   const handleTitleFilterChange = (value) => {
     setTitleFilter(value)
@@ -126,18 +115,6 @@ export const GameTable = ({ games, isAdmin }: Props) => {
           className={`form-control w-25 ${styles['dark-input']}`}
           placeholder='Search'
         />
-
-        <div className='form-check'>
-          <label className='form-check-label'>
-            <input
-              className={`form-check-input ${styles['dark-input']}`}
-              type='checkbox'
-              checked={stealthFilter}
-              onChange={(e) => handleStealthFilterChange(e.target.checked)}
-            />
-            Sneaky?
-          </label>
-        </div>
 
         <div className='form-check'>
           <label className='form-check-label'>
