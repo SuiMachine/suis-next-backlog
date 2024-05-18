@@ -13,7 +13,6 @@ type Game = {
   platform: string | null
   rating: number | null
   releaseYear: number | null
-  stealth: boolean | null
   timeSpent: number | null
   tss: boolean | null
   streamed: boolean | null

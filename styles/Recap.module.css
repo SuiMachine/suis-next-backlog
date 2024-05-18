@@ -60,7 +60,7 @@
 }
 
 .formFinished textarea, .formTimeSpent textarea {
-    background: transparent;
+    background: rgba(0, 0, 0, 0.62);
     color: white;
     font-size: xx-large;
     resize: none;
@@ -78,7 +78,7 @@
 }
 
 .comment textarea {
-    background: transparent;
+    background: rgba(0, 0, 0, 0.62);
     height: 100%;
     color: white;
     font-size: xx-large;

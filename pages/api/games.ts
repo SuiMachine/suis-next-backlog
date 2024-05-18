@@ -132,7 +132,6 @@ async function addGame(req, res) {
           comment,
           timeSpent: timeSpent || null,
           finished,
-          stealth,
           tss,
           rating: rating || null,
           platform,

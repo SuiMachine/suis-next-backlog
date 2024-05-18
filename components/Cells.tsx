@@ -8,6 +8,20 @@ import styles from '../styles/GameTable.module.css'
 import CoverImage from './CoverImage'
 
 export const CommentCell = ({ value, row }) => {
+  //Stupid formatting hack - idk, I don't know Javascript
+  if(value.length > 0) {   
+    let newString = ""
+    let lines = value.split('\n');
+    lines.forEach(element => {
+    if(element.length > 1 && element[0] == '-' && element[1] == " ")
+      newString += "•" + element.substring(1) + "\n"
+    else
+      newString += element + "\n"
+    });
+    value = newString
+  }
+
+
   return (
     <span
       dangerouslySetInnerHTML={{ __html: value.replace(/\n/g, `<div class="${styles['br-div']}"></div>`) }}

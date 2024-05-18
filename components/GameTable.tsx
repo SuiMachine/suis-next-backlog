@@ -14,7 +14,6 @@ type Props = {
 }
 
 export const GameTable = ({ games, isAdmin }: Props) => {
-  const [stealthFilter, setStealthFilter] = useState(false)
   const [showCovers, setShowCovers] = useState(true)
   const [titleFilter, setTitleFilter] = useState('')
   const { params, updateParams, paramsLoaded } = useNextQueryParams({
@@ -25,7 +24,6 @@ export const GameTable = ({ games, isAdmin }: Props) => {
 
   const data: Array<any> = useMemo(() => {
     return games
-      .filter((x) => (stealthFilter && x.stealth) || !stealthFilter)
       .filter((x) => (titleFilter && x.title.toLowerCase().includes(titleFilter.toLowerCase())) || titleFilter === '')
       .map((x) => {
         return {
@@ -37,14 +35,13 @@ export const GameTable = ({ games, isAdmin }: Props) => {
           comment: x.comment,
           streamed: x.streamed,
           timeSpent: x.timeSpent,
-          stealth: x.stealth,
           igdbUrl: x.igdbUrl,
           releaseYear: x.releaseYear,
           vods: x.vods,
           coverImageId: x.coverImageId,
         }
       })
-  }, [games, stealthFilter, titleFilter])
+  }, [games, titleFilter])
 
   const hiddenColumns = useMemo(() => (isAdmin ? [] : ['_id']), [isAdmin])
 
