@@ -30,6 +30,10 @@ export default async function handler(req, res) {
     case 'PUT': {
       return updateGame(req, res)
     }
+
+    case 'DELETE': {
+      return deleteGame(req, res)
+    }
   }
 }
 
@@ -78,7 +82,6 @@ async function addGame(req, res) {
     const timeSpent = req.body.timeSpent
     const finished = req.body.finished
     const finishedDate = req.body.finished ? req.body.finishedDate : null
-    const stealth = req.body.stealth
     const tss = req.body.tss
     const streamed = req.body.streamed
     const rating = req.body.rating
@@ -201,5 +204,30 @@ async function updateGame(req, res) {
   } catch (error: any) {
     // return an error
     return res.status(500).json({ errorType: 'updateGameError', error })
+  }
+}
+
+async function deleteGame(req, res) {
+  try {
+    const session: Session | null = await getServerSession(req, res, authOptions)
+
+    if (session?.user?.name !== process.env.ADMIN_USER_NAME) {
+      res.status(401).json({ errorType: 'updateGameSessionError', session, error: 'Unauthorized' })
+    }
+
+    let { db } = await connectToDatabase()
+    const game: Game = await db.collection('games').findOne({ _id: ObjectId(req.body) })
+    if(game.comment != "")
+      throw Error("Element already has comment written down")
+    
+    await db.collection('games').deleteOne({_id: ObjectId(game._id) })
+
+    return res.json({
+      message: 'Game removed successfully',
+      success: true,
+    })
+  }
+  catch(error: any) {
+    return res.status(500).json({ errorType: 'deleteGameError', error })
   }
 }

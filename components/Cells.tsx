@@ -4,6 +4,7 @@ import dayjs from 'dayjs'
 import { toast } from 'react-toastify'
 
 import { VodDialog } from './VodDialog'
+import { RemoveGameDialog } from './RemoveGameDialog'
 import styles from '../styles/GameTable.module.css'
 import CoverImage from './CoverImage'
 
@@ -126,11 +127,15 @@ export const AdminCell = ({ value, row, showVodButton = false, showNextButton = 
       })
   }
 
+  let displayDelete = row.original.comment == "" || row.original.comment == null;
+
   return (
+
     <div className={`${styles['adminCell']}`}>
       <a href={`/recap?id=${value}`}>Recap</a>
 
       {showVodButton && <VodDialog game={row.original} />}
+      {displayDelete && <RemoveGameDialog game={row.original} />}
 
       {showNextButton && (
         <a href='#' onClick={setUpcoming}>
