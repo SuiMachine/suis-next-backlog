@@ -223,6 +223,14 @@ async function deleteGame(req, res) {
     //TODO: Check if in database there is any other entry with the game and destroy cloudinary image?
     await db.collection('games').deleteOne({_id: ObjectId(game._id) })
 
+    const anyOtherGameWithTheSameCover: Game = await db.collection('games').findOne({ coverImageId: game.coverImageId })
+    if(anyOtherGameWithTheSameCover == null)
+    {
+      cloudinary.uploader.destroy("covers/" + game.coverImageId, function(error) {
+        if(error != null)
+          console.log("cloudinary destroy error: " + error)
+      })
+    }
     return res.json({
       message: 'Game removed successfully',
       success: true,
