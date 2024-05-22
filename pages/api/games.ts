@@ -220,6 +220,7 @@ async function deleteGame(req, res) {
     if(game.comment != "")
       throw Error("Element already has comment written down")
     
+    //TODO: Check if in database there is any other entry with the game and destroy cloudinary image?
     await db.collection('games').deleteOne({_id: ObjectId(game._id) })
 
     return res.json({

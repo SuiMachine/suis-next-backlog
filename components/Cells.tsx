@@ -135,13 +135,13 @@ export const AdminCell = ({ value, row, showVodButton = false, showNextButton = 
       <a href={`/recap?id=${value}`}>Recap</a>
 
       {showVodButton && <VodDialog game={row.original} />}
-      {displayDelete && <RemoveGameDialog game={row.original} />}
-
       {showNextButton && (
         <a href='#' onClick={setUpcoming}>
           Set upcoming
         </a>
       )}
+      {displayDelete && <RemoveGameDialog game={row.original} />}
+
     </div>
   )
 }
