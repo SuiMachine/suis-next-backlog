@@ -6,6 +6,7 @@ type Game = {
   developers: Array<string>
   finished: string | null
   finishedDate: string | null
+  approximateDate: boolean | null
   igdbId: number
   igdbUrl: string
   keywords: Array<string>

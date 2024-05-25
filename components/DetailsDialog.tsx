@@ -31,6 +31,18 @@ export const DetailsDialog = (props: Props) => {
           </div>
 
           <div>
+            <label htmlFor='approximateDate' className='me-2'>
+              Approximate date?
+            </label>
+            <input
+              name='approximateDate'
+              type='checkbox'
+              checked={game.approximateDate || false}
+              onChange={(e) => setGame({ ...game, approximateDate: e.target.checked })}
+            ></input>
+          </div>
+
+          <div>
             <label htmlFor='streamed' className='me-2'>
               Streamed?
             </label>
