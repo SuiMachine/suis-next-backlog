@@ -31,7 +31,8 @@ export const CommentCell = ({ value, row }) => {
 }
 
 export const DateCell = ({ value, row }) => {
-  if (row.original['finished'] === 'Happening') return <span>Ongoing or soon™</span>
+  if (row.original['finished'] === 'Happening')
+    return <span>Ongoing or soon™</span>
 
   const formattedDate = value ? dayjs(new Date(value)).format('DD MMM YYYY') : ''
   return <span>{formattedDate}</span>
@@ -94,9 +95,14 @@ export const TitleCell = ({ value, row, showCovers }) => {
 }
 
 export const FinishedCell = ({ value, row }) => {
-  if (row.original.finished === 'Nope') return <>Did not finish {`(${value}h)`}</>
-  if (row.original.finished === 'Yes') return <>Finished {`(${value}h)`}</>
 
+  value = value ? Math.round(parseFloat(value) * 10) / 10 : value
+  
+  if (row.original.finished === 'Nope')
+    return <>Did not finish {`(${value}h)`}</>
+  if (row.original.finished === 'Yes')
+    return <>Finished {`(${value}h)`}</>
+  
   const wordArray = row.original.finished.split(/(\/)/)
   const withWordBreaks = wordArray.map((x, i) => {
     return (
