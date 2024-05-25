@@ -31,6 +31,7 @@ export const GameTable = ({ games, isAdmin }: Props) => {
           title: x.title,
           finished: x.finished,
           finishedDate: x.finishedDate,
+          approximateDate: x.approximateDate,
           rating: x.rating,
           comment: x.comment,
           streamed: x.streamed,

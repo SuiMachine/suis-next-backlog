@@ -34,8 +34,15 @@ export const DateCell = ({ value, row }) => {
   if (row.original['finished'] === 'Happening')
     return <span>Ongoing or soon™</span>
 
-  const formattedDate = value ? dayjs(new Date(value)).format('DD MMM YYYY') : ''
-  return <span>{formattedDate}</span>
+  if(row.original['approximateDate']) {
+    const formattedDate = value ? "Sometime in " + dayjs(new Date(value)).format('YYYY') : ''
+    return <span>{formattedDate}</span>
+  }
+  else {
+    const formattedDate = value ? dayjs(new Date(value)).format('DD MMM YYYY') : ''
+    return <span>{formattedDate}</span>
+  }
+
 }
 
 export const CheckmarkCell = ({ value }) => {
