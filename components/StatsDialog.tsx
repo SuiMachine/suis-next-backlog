@@ -14,7 +14,7 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip)
 
-const chartOptions: ChartOptions<'bar'> = {
+const raitingsDistributionChartOptions: ChartOptions<'bar'> = {
   responsive: true,
   scales: {
     x: {
@@ -31,6 +31,28 @@ const chartOptions: ChartOptions<'bar'> = {
     title: {
       display: true,
       text: 'Rating distribution',
+      color: '#FFF',
+    },
+  },
+}
+
+const ratingsPerYearChartOptions: ChartOptions<'bar'> = {
+  responsive: true,
+  scales: {
+    x: {
+      ticks: { color: '#FFF' },
+    },
+    y: {
+      ticks: { color: '#FFF' },
+    },
+  },
+  plugins: {
+    legend: {
+      display: false,
+    },
+    title: {
+      display: true,
+      text: 'Rating per release year',
       color: '#FFF',
     },
   },
@@ -117,6 +139,46 @@ export const StatsDialog = (props: Props) => {
     return data
   }, [games])
 
+  const ratingPerYearData = useMemo(() => {
+    var rating = {}
+    var ratingCounts = {}
+
+
+    if (games.length) {
+      games.forEach((game) => {
+        if (game.rating) {
+          if(game.releaseYear != null && game.releaseYear != Infinity) {
+              if(ratingCounts[game.releaseYear] == null) {
+                  ratingCounts[game.releaseYear] = 0
+                  rating[game.releaseYear] = 0
+                }
+
+              ratingCounts[game.releaseYear] += 1
+              rating[game.releaseYear] += game.rating
+            }
+        }
+      })
+
+      for(var key in ratingCounts) {
+        var raitingsCountForTheYear = ratingCounts[key];
+        var totalRatingForTheYear = rating[key]
+        rating[key] = totalRatingForTheYear / raitingsCountForTheYear
+      }  
+    }
+
+    const data: ChartData<'bar'> = {
+      labels: Object.keys(rating),
+      datasets: [
+        {
+          data: Object.values(rating),
+          backgroundColor: 'rgba(255, 99, 132, 0.5)',
+        },
+      ],
+    }
+
+    return data
+  }, [games])
+
   return (
     <>
       <button className='btn btn-primary' onClick={() => setShow(true)}>
@@ -142,7 +204,8 @@ export const StatsDialog = (props: Props) => {
 
           <hr />
 
-          <Bar data={ratingCountsData} options={chartOptions} />
+          <Bar data={ratingCountsData} options={raitingsDistributionChartOptions} />
+          <Bar data={ratingPerYearData} options={ratingsPerYearChartOptions} />
         </Modal.Body>
 
         <Modal.Footer>
