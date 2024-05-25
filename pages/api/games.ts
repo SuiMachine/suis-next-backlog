@@ -82,6 +82,7 @@ async function addGame(req, res) {
     const timeSpent = req.body.timeSpent
     const finished = req.body.finished
     const finishedDate = req.body.finished ? req.body.finishedDate : null
+    const approximateDate = req.body.approximateDate
     const tss = req.body.tss
     const streamed = req.body.streamed
     const rating = req.body.rating
@@ -132,6 +133,7 @@ async function addGame(req, res) {
           igdbUrl: fetchedGame.url,
           notPollable,
           finishedDate,
+          approximateDate,
           comment,
           timeSpent: timeSpent || null,
           finished,

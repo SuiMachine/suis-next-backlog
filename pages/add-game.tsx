@@ -63,6 +63,7 @@ export default function AddGame({ isAdmin, username }) {
         finished: '',
         rating: null,
         stealth: false,
+        approximateDate: false,
         tss: false,
         streamed: false,
         platform: '',
