@@ -81,7 +81,7 @@ export const StatsDialog = (props: Props) => {
     const finishedGames = games.filter((x) => x.finished && x.finished !== 'Nope' && x.finished !== 'Happening').length
     //const droppedGames = games.filter((x) => x.finished && x.finished === 'Nope').length
     const backlogLength = games.filter((x) => !x.finishedDate).length
-    const playedGamesLength = games.filter((x) => x.finishedDate).length
+    const playedGamesLength = games.filter((x) => x.finishedDate && x.finished !== 'Happening').length
 
     return [
       {
