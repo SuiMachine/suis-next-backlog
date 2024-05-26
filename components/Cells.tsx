@@ -106,9 +106,9 @@ export const FinishedCell = ({ value, row }) => {
   value = value ? Math.round(parseFloat(value) * 10) / 10 : value
   
   if (row.original.finished === 'Nope')
-    return <>Did not finish {`(${value}h)`}</>
+    return <>Did not finish {value ? `(${value}h)` : ""}</>
   if (row.original.finished === 'Yes')
-    return <>Finished {`(${value}h)`}</>
+    return <>Finished {value ? `(${value}h)` : "TIME? WTF?"}</>
   
   const wordArray = row.original.finished.split(/(\/)/)
   const withWordBreaks = wordArray.map((x, i) => {
