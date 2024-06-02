@@ -5,8 +5,10 @@ import { Cell, ColumnInstance, Row } from 'react-table'
  *********************************************************************/
 export const dateSort = (rowA, rowB, id) => {
   // I am a hack
-  if (rowA.original['finished'] === 'Happening') return 1
-  if (rowB.original['finished'] === 'Happening') return -1
+  if (rowA.original['finished'] === 'Happening')
+    return 1
+  if (rowB.original['finished'] === 'Happening')
+    return -1
 
   const a = new Date(rowA.values[id]).getTime()
   const b = new Date(rowB.values[id]).getTime()

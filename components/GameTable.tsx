@@ -22,9 +22,25 @@ export const GameTable = ({ games, isAdmin }: Props) => {
     title: '',
   })
 
+  function manualFilter(game : Game, filter : string)
+  {
+    if(filter.startsWith("y:"))
+    {
+      let yearParse = Number.parseInt(filter.trim().substring(2))
+      if(yearParse)
+        return game.releaseYear == yearParse
+      else
+        return true;
+    }
+    else
+    {
+      return game.title.toLowerCase().includes(titleFilter.toLowerCase())
+    }
+  }
+
   const data: Array<any> = useMemo(() => {
     return games
-      .filter((x) => (titleFilter && x.title.toLowerCase().includes(titleFilter.toLowerCase())) || titleFilter === '')
+      .filter((x) => (titleFilter && manualFilter(x, titleFilter)) || titleFilter === '')
       .map((x) => {
         return {
           _id: x._id,
