@@ -1,5 +1,5 @@
 type Props = {
-  type: 'youtube' | 'twitch' | 'twitter' | 'discord'
+  type: 'youtube' | 'twitch' | 'twitter' | 'discord' | 'bsky'
   size?: number
   className?: string
 }
@@ -38,7 +38,7 @@ export const Icon = (props: Props) => {
     )
   }
 
-  if (type === 'twitter') {
+  if (type === 'twitter' || type === 'bsky') {
     return (
       <svg
         xmlns='http://www.w3.org/2000/svg'

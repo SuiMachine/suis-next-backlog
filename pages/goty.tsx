@@ -22,11 +22,14 @@ export default function Goty({ games }: Props) {
             <h1>Sui's Game of the Year list</h1>
 
             <div className='row gx-3'>
-              <a href='https://www.twitch.tv/suimachine' target='_blank' rel='noreferrer' className='col'>
+              <a href='https://www.twitch.tv/sui_vt' target='_blank' rel='noreferrer' className='col'>
                 <Icon type='twitch' size={32} />
               </a>
-              <a href='https://discord.gg/FvJ5dXctFQ' target='_blank' rel='noreferrer' className='col'>
-                <Icon type='discord' size={32} />
+              <a href='https://bsky.app/profile/suimachine.bsky.social' target='_blank' rel='noreferrer' className='col'>
+                <Icon type='bsky' size={32} />
+              </a>
+              <a href='https://twitter.com/sui_machine' target='_blank' rel='noreferrer' className='col'>
+                <Icon type='twitter' size={32} />
               </a>
             </div>
           </div>
