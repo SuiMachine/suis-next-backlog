@@ -30,7 +30,7 @@ async function getGames() {
 }
 
 export const metadata: Metadata = {
-    title: 'Admin panel | YAME! YAME!'
+    title: 'Admin panel | \~Sui\'s little backlog\~'
 }
 
 export default async function Admin() {

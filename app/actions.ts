@@ -236,7 +236,7 @@ export async function getTwitchUserAction(formData: FormData) {
 
         if (isAdmin) {
             const authToken = await getIgdbToken(formData)
-            const username = 'TheKotti'
+            const username = 'Sui_VT'
             const url = `https://api.twitch.tv/helix/users?login=${username}`
             const res = await fetch(url, {
                 headers: {

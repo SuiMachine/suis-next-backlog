@@ -5,7 +5,7 @@ import NavWrapper from 'components/NavWrapper'
 import AddGame from 'components/AddGame'
 
 export const metadata: Metadata = {
-    title: 'Add game | YAME! YAME!'
+    title: 'Add game | \~Sui\'s little backlog\~'
 }
 
 export default async function AddGamePage() {

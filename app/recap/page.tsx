@@ -22,7 +22,7 @@ async function getGame(id: string) {
 }
 
 export const metadata: Metadata = {
-    title: 'Recap | YAME! YAME!'
+    title: 'Recap | \~Sui\'s little backlog\~'
 }
 
 export default async function RecapPage({

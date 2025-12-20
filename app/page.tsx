@@ -22,7 +22,7 @@ async function getGames(): Promise<Game[]> {
 }
 
 export const metadata: Metadata = {
-  title: 'YAME! YAME!'
+  title: '\~Sui\'s little backlog\~'
 }
 
 export default async function Home() {
@@ -34,19 +34,16 @@ export default async function Home() {
         <h1>{process.env.ADMIN_USER_NAME}&apos;s bad takes on games</h1>
 
         <div className='row gx-3'>
-          {(process.env.ADMIN_USER_NAME == "TheKotti") && (
+          {(process.env.ADMIN_USER_NAME == "Sui_VT") && (
             <>
-              <a href='https://www.youtube.com/thekotti' target='_blank' rel='noreferrer' className='col'>
+              <a href='https://www.youtube.com/@sui_vt' target='_blank' rel='noreferrer' className='col'>
                 <Icon type='youtube' size={32} />
               </a>
-              <a href='https://www.twitch.tv/thekotti' target='_blank' rel='noreferrer' className='col'>
+              <a href='https://www.twitch.tv/sui_vt' target='_blank' rel='noreferrer' className='col'>
                 <Icon type='twitch' size={32} />
               </a>
-              <a href='https://bsky.app/profile/thekotti.bsky.social' target='_blank' rel='noreferrer' className='col'>
+              <a href='https://bsky.app/profile/suimachine.bsky.social' target='_blank' rel='noreferrer' className='col'>
                 <Icon type='bluesky' size={32} />
-              </a>
-              <a href='https://discord.gg/thekotti' target='_blank' rel='noreferrer' className='col'>
-                <Icon type='discord' size={32} />
               </a>
             </>
           )}
