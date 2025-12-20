@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useMemo, useState } from 'react'
 import { Modal } from 'react-bootstrap'
 import { Bar } from 'react-chartjs-2'
@@ -14,7 +16,7 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip)
 
-const raitingsDistributionChartOptions: ChartOptions<'bar'> = {
+const chartOptions: ChartOptions<'bar'> = {
   responsive: true,
   scales: {
     x: {
@@ -36,28 +38,6 @@ const raitingsDistributionChartOptions: ChartOptions<'bar'> = {
   },
 }
 
-const ratingsPerYearChartOptions: ChartOptions<'bar'> = {
-  responsive: true,
-  scales: {
-    x: {
-      ticks: { color: '#FFF' },
-    },
-    y: {
-      ticks: { color: '#FFF' },
-    },
-  },
-  plugins: {
-    legend: {
-      display: false,
-    },
-    title: {
-      display: true,
-      text: 'Rating per release year',
-      color: '#FFF',
-    },
-  },
-}
-
 type Props = {
   games: Game[]
 }
@@ -71,17 +51,23 @@ export const StatsDialog = (props: Props) => {
   const stats = useMemo(() => {
     if (games.length === 0) return []
     // This filter crap shouldn't be necessary but fuck it
-    const ratings = games.map((x) => x.rating).filter((x): x is number => x !== null)
-    const times = games.map((x) => x.timeSpent).filter((x): x is number => x !== null)
+    const ratings = games.map((x) => x.rating).filter((x): x is number => !!x)
+    const times = games.map((x) => x.timeSpent).filter((x): x is number => !!x)
+    const additionalTimes = games.map((x) => x.additionalTimeSpent).filter((x): x is number => !!x)
+    const allTimes = times.concat(additionalTimes)
+    const backlog = games.filter((x) => !x.finishedDate)
 
     const averageRating = ratings.reduce((a, b) => a + b, 0) / ratings.length
-    const totalTime = times.reduce((a, b) => a + b, 0)
-    const averageTime = totalTime / times.length
+    const totalTime = allTimes.reduce((a, b) => a + b, 0)
+    const averageTime = totalTime / allTimes.length
     const streamedGames = games.filter((x) => x.streamed).length
     const finishedGames = games.filter((x) => x.finished && x.finished !== 'Nope' && x.finished !== 'Happening').length
-    //const droppedGames = games.filter((x) => x.finished && x.finished === 'Nope').length
-    const backlogLength = games.filter((x) => !x.finishedDate).length
+    const backlogLength = backlog.length
     const playedGamesLength = games.filter((x) => x.finishedDate && x.finished !== 'Happening').length
+    const backlogTime = backlog
+      .map((x) => x.hltbMain)
+      .filter((x) => x)
+      .reduce((a, b) => (a || 0) + (b || 0), 0)
 
     return [
       {
@@ -112,6 +98,10 @@ export const StatsDialog = (props: Props) => {
         key: 'Games in backlog',
         value: backlogLength,
       },
+      {
+        key: 'Backlog time estimate',
+        value: `${backlogTime} hours`,
+      },
     ]
   }, [games])
 
@@ -131,46 +121,6 @@ export const StatsDialog = (props: Props) => {
       datasets: [
         {
           data: Object.values(ratingCounts),
-          backgroundColor: 'rgba(255, 99, 132, 0.5)',
-        },
-      ],
-    }
-
-    return data
-  }, [games])
-
-  const ratingPerYearData = useMemo(() => {
-    var rating = {}
-    var ratingCounts = {}
-
-
-    if (games.length) {
-      games.forEach((game) => {
-        if (game.rating) {
-          if(game.releaseYear != null && game.releaseYear != Infinity) {
-              if(ratingCounts[game.releaseYear] == null) {
-                  ratingCounts[game.releaseYear] = 0
-                  rating[game.releaseYear] = 0
-                }
-
-              ratingCounts[game.releaseYear] += 1
-              rating[game.releaseYear] += game.rating
-            }
-        }
-      })
-
-      for(var key in ratingCounts) {
-        var raitingsCountForTheYear = ratingCounts[key];
-        var totalRatingForTheYear = rating[key]
-        rating[key] = totalRatingForTheYear / raitingsCountForTheYear
-      }  
-    }
-
-    const data: ChartData<'bar'> = {
-      labels: Object.keys(rating),
-      datasets: [
-        {
-          data: Object.values(rating),
           backgroundColor: 'rgba(255, 99, 132, 0.5)',
         },
       ],
@@ -204,8 +154,7 @@ export const StatsDialog = (props: Props) => {
 
           <hr />
 
-          <Bar data={ratingCountsData} options={raitingsDistributionChartOptions} />
-          <Bar data={ratingPerYearData} options={ratingsPerYearChartOptions} />
+          <Bar data={ratingCountsData} options={chartOptions} />
         </Modal.Body>
 
         <Modal.Footer>

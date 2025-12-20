@@ -52,18 +52,24 @@
 
 .topRow {
     width: 90%;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
 }
 
-.formFinished, .formTimeSpent {
+.formFinished, .formTimeSpent, .formTags {
     display: flex;
     flex-direction: column;
 }
 
-.formFinished textarea, .formTimeSpent textarea {
-    background: rgba(0, 0, 0, 0.62);
+.formFinished textarea, .formTimeSpent textarea, .formTags textarea {
+    background: transparent;
     color: white;
     font-size: xx-large;
     resize: none;
+    height: 4.5rem;
 }
 
 .comment {
@@ -78,7 +84,7 @@
 }
 
 .comment textarea {
-    background: rgba(0, 0, 0, 0.62);
+    background: transparent;
     height: 100%;
     color: white;
     font-size: xx-large;

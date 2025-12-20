@@ -1,48 +1,57 @@
 import React from 'react'
-import axios from 'axios'
 import dayjs from 'dayjs'
-import { toast } from 'react-toastify'
 
 import { VodDialog } from './VodDialog'
-import { RemoveGameDialog } from './RemoveGameDialog'
 import styles from '../styles/GameTable.module.css'
 import CoverImage from './CoverImage'
+import { Tag } from './Tag'
 
-export const CommentCell = ({ value, row }) => {
-  //Stupid formatting hack - idk, I don't know Javascript
-  if(value.length > 0) {   
-    let newString = ""
-    let lines = value.split('\n');
-    lines.forEach(element => {
-    if(element.length > 1 && element[0] == '-' && element[1] == " ")
-      newString += "•" + element.substring(1) + "\n"
-    else
-      newString += element + "\n"
-    });
-    value = newString
-  }
-
+export const CommentCell = ({ value, row, handleTagFilterChange }) => {
+  const tags: string[] = row.original.tags
 
   return (
-    <span
-      dangerouslySetInnerHTML={{ __html: value.replace(/\n/g, `<div class="${styles['br-div']}"></div>`) }}
-    ></span>
+    <>
+      {tags && tags.length > 0 && (
+        <div className='pb-2 d-flex gap-2'>
+          {tags.sort().map((tag) => {
+            return (
+              <Tag value={tag} key={tag} onClick={() => handleTagFilterChange(tag)}></Tag>
+            )
+          })}
+        </div>
+      )}
+
+      <span
+        dangerouslySetInnerHTML={{ __html: value.replace(/\n/g, `<div class="${styles['br-div']}"></div>`) }}
+      ></span>
+    </>
+  )
+}
+
+export const TagCell = ({ value, row, handleTagFilterChange }) => {
+  console.log(value)
+  const tags: string[] = row.original.tags
+
+  return (
+    <>
+      {tags && tags.length > 0 && (
+        <div className='d-flex gap-2'>
+          {tags.sort().map((tag) => {
+            return (
+              <Tag value={tag} key={tag} onClick={() => handleTagFilterChange(tag)}></Tag>
+            )
+          })}
+        </div>
+      )}
+    </>
   )
 }
 
 export const DateCell = ({ value, row }) => {
-  if (row.original['finished'] === 'Happening')
-    return <span>Ongoing or soon™</span>
+  if (row.original['finished'] === 'Happening') return <span>Ongoing or soon™</span>
 
-  if(row.original['approximateDate']) {
-    const formattedDate = value ? "Sometime in " + dayjs(new Date(value)).format('YYYY') : ''
-    return <span>{formattedDate}</span>
-  }
-  else {
-    const formattedDate = value ? dayjs(new Date(value)).format('DD MMM YYYY') : ''
-    return <span>{formattedDate}</span>
-  }
-
+  const formattedDate = value ? dayjs(new Date(value)).format('DD MMM YYYY') : ''
+  return <span>{formattedDate}</span>
 }
 
 export const CheckmarkCell = ({ value }) => {
@@ -61,7 +70,7 @@ export const VodCell = ({ value, row }) => {
         )
       }
       return (
-        <a key={vod} href={vod}>
+        <a key={vod} href={vod} style={{ whiteSpace: 'nowrap' }}>
           Part {index + 1}
         </a>
       )
@@ -75,9 +84,12 @@ export const TitleCell = ({ value, row, showCovers }) => {
   if (showCovers) {
     return <CoverImage game={row.original as Game} />
   }
+
+  const formattedTitle = value.startsWith("The ") ? value.substring(4) + ", The" : value
+
   return (
     <div>
-      {`${value}${row.original.releaseYear ? ' (' + row.original.releaseYear + ')' : ''}`}
+      {`${formattedTitle}${row.original.releaseYear ? ' (' + row.original.releaseYear + ')' : ''}`}
       <a
         href={row.original.igdbUrl}
         target='_blank'
@@ -102,14 +114,10 @@ export const TitleCell = ({ value, row, showCovers }) => {
 }
 
 export const FinishedCell = ({ value, row }) => {
+  const timeString = `${value}h ${row.original.additionalTimeSpent ? `+ ${row.original.additionalTimeSpent}h` : ''}`.trim()
+  if (row.original.finished === 'Nope') return <>Did not finish {`(${timeString})`}</>
+  if (row.original.finished === 'Yes') return <>Finished {`(${timeString})`}</>
 
-  value = value ? Math.round(parseFloat(value) * 10) / 10 : value
-  
-  if (row.original.finished === 'Nope')
-    return <>Did not finish {value ? `(${value}h)` : ""}</>
-  if (row.original.finished === 'Yes')
-    return <>Finished {value ? `(${value}h)` : "TIME? WTF?"}</>
-  
   const wordArray = row.original.finished.split(/(\/)/)
   const withWordBreaks = wordArray.map((x, i) => {
     return (
@@ -122,39 +130,17 @@ export const FinishedCell = ({ value, row }) => {
 
   return value ? (
     <>
-      {withWordBreaks} {`(${value}h)`}
+      {withWordBreaks} {`(${timeString})`}
     </>
   ) : null
 }
 
-export const AdminCell = ({ value, row, showVodButton = false, showNextButton = false }) => {
-  const setUpcoming = () => {
-    axios
-      .put('api/setUpcoming', { id: row.original._id })
-      .then((_res) => {
-        toast.success('Game set as upcoming 👌')
-      })
-      .catch((err) => {
-        toast.error('Save failed')
-        console.log('ERROR: ', err)
-      })
-  }
-
-  let displayDelete = row.original.comment == "" || row.original.comment == null;
-
+export const AdminCell = ({ value, row, showVodButton = false }) => {
   return (
-
     <div className={`${styles['adminCell']}`}>
       <a href={`/recap?id=${value}`}>Recap</a>
 
       {showVodButton && <VodDialog game={row.original} />}
-      {showNextButton && (
-        <a href='#' onClick={setUpcoming}>
-          Set upcoming
-        </a>
-      )}
-      {displayDelete && <RemoveGameDialog game={row.original} />}
-
     </div>
   )
 }

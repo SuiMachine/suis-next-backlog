@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { Modal } from 'react-bootstrap'
 import DatePicker from 'react-datepicker'
-import 'react-datepicker/dist/react-datepicker.css'
 import dayjs from 'dayjs'
 
 type Props = {
@@ -16,7 +15,7 @@ export const DetailsDialog = (props: Props) => {
   return (
     <>
       <button onClick={() => setShow(true)}>Details</button>
-      <Modal show={show} onHide={() => setShow(false)} centered>
+      <Modal show={show} onHide={() => setShow(false)} centered id="detailsDialog">
         <Modal.Header closeButton>
           <Modal.Title>Details</Modal.Title>
         </Modal.Header>
@@ -24,7 +23,7 @@ export const DetailsDialog = (props: Props) => {
           <div>
             <DatePicker
               selected={game.finishedDate ? dayjs(game.finishedDate).toDate() : null}
-              onChange={(date: Date) => setGame({ ...game, finishedDate: date.toISOString() })}
+              onChange={(date) => setGame({ ...game, finishedDate: (date?.toISOString() || null) })}
               placeholderText='Finished date'
               isClearable
             />
@@ -54,16 +53,6 @@ export const DetailsDialog = (props: Props) => {
             ></input>
           </div>
 
-          <div>
-            <label htmlFor='banned' className='me-2'>
-              Not pollable because
-            </label>
-            <input
-              name='banned'
-              value={game.notPollable || ''}
-              onChange={(e) => setGame({ ...game, notPollable: e.target.value })}
-            ></input>
-          </div>
         </Modal.Body>
         <Modal.Footer>
           <button className='btn btn-light' onClick={() => setShow(false)}>

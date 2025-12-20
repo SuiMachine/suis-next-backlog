@@ -1,32 +1,37 @@
-/* eslint-disable react/jsx-key */
-import { useMemo, useState } from 'react'
-import { Cell, Row, usePagination, useSortBy, useTable } from 'react-table'
+'use client'
 
+import { useMemo, useState } from 'react'
+import { usePagination, useSortBy, useTable } from 'react-table'
+import Select from 'react-select'
 import styles from '../styles/GameTable.module.css'
 import { backlogTableColumns } from '../utils/columns'
-import { formatCell } from '../utils/utils'
+import { formatCell, formatHeader, getHltbString, titleSortSimple } from '../utils/utils'
+import { ReadonlyURLSearchParams } from 'next/navigation'
+import CoverImage from './CoverImage'
 
 type Props = {
   games: Array<Game>
   isAdmin: boolean
+  updateParams: (newParams: Record<string, any>) => void
+  initialParams: ReadonlyURLSearchParams
 }
 
-export const BacklogTable = ({ games, isAdmin }: Props) => {
-  const [titleFilter, setTitleFilter] = useState('')
+export const BacklogTable = ({ games, updateParams, initialParams, isAdmin }: Props) => {
+  const [showCovers, setShowCovers] = useState(initialParams.get('showCovers') != 'false')
+  const [titleFilter, setTitleFilter] = useState(initialParams.get('title') ?? '')
+  const [tagFilter, setTagFilter] = useState(initialParams.get('tag') ?? null)
 
   const data: Array<any> = useMemo(() => {
     return games
+      .filter((x) => (tagFilter && x.tags?.includes(tagFilter)) || !tagFilter)
       .filter((x) => (titleFilter && x.title.toLowerCase().includes(titleFilter.toLowerCase())) || titleFilter === '')
       .map((x) => {
         return {
-          _id: x._id,
-          title: x.title,
-          notPollable: x.notPollable,
-          igdbUrl: x.igdbUrl,
-          releaseYear: x.releaseYear,
+          ...x,
+          hltbString: getHltbString(x),
         }
       })
-  }, [games, titleFilter])
+  }, [games, tagFilter, titleFilter])
 
   const hiddenColumns = useMemo(() => (isAdmin ? [] : ['_id']), [isAdmin])
 
@@ -55,99 +60,225 @@ export const BacklogTable = ({ games, isAdmin }: Props) => {
         sortBy: [
           {
             id: 'title',
-            desc: false,
+            desc: true,
           },
         ],
         pageSize: 10,
       },
+      disableSortRemove: true,
     },
     useSortBy,
     usePagination
   )
 
+  const tagSelectOptions = useMemo(() => {
+      const tags: string[] = []
+  
+      games.forEach(g => {
+        g.tags?.forEach(t => tags.push(t))
+      })
+      
+      // count occurrences per tag
+      const tagCounts: Record<string, number> = {}
+      tags.forEach(t => {
+        tagCounts[t] = (tagCounts[t] || 0) + 1
+      })
+  
+      const uniqueTags = [...new Set(tags)].sort()
+  
+      const tagOptions = uniqueTags.map(t => {
+        return { value: t, label: `${t} (${tagCounts[t] ?? 0})` }
+      })
+  
+      return tagOptions
+    }, [games])
+
+  const handleTitleFilterChange = (value) => {
+    setTitleFilter(value)
+    updateParams({ title: value })
+  }
+
+  const handleTagFilterChange = (value) => {
+    setTagFilter(value)
+    updateParams({ tag: value })
+  }
+
+  const handleShowCoversChange = (checked) => {
+    setShowCovers(checked)
+    updateParams({ showCovers: checked })
+  }
+
   return (
     <>
-      <input
-        value={titleFilter}
-        onChange={(e) => setTitleFilter(e.target.value)}
-        className={`form-control w-25 ${styles['dark-input']}`}
-        placeholder='Search'
-      />
-
-      <table {...getTableProps} className={`w-100 ${styles.gameTable}`}>
-        <thead>
-          <tr>
-            {headers.map((column) => {
-              if (column.id === '_id' && !isAdmin) return
-              return <th {...column.getHeaderProps(column.getSortByToggleProps())}>{column.render('Header')}</th>
-            })}
-          </tr>
-        </thead>
-
-        <tbody {...getTableBodyProps()}>
-          {page.map((row) => {
-            prepareRow(row)
-            return (
-              <tr {...row.getRowProps()}>
-                {row.cells.map((cell) => {
-                  return formatCell(cell, row)
-                })}
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
-
-      <div className='pagination d-flex align-items-center gap-2'>
-        <div className='btn-group'>
-          <button className={`btn ${styles['dark-input']}`} onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
-            {'<<'}
-          </button>
-          <button className={`btn ${styles['dark-input']}`} onClick={() => previousPage()} disabled={!canPreviousPage}>
-            {'<'}
-          </button>
-        </div>
-
-        <div className='btn-group'>
-          <button className={`btn ${styles['dark-input']}`} onClick={() => nextPage()} disabled={!canNextPage}>
-            {'>'}
-          </button>
-          <button
-            className={`btn ${styles['dark-input']}`}
-            onClick={() => gotoPage(pageCount - 1)}
-            disabled={!canNextPage}
-          >
-            {'>>'}
-          </button>
-        </div>
-
-        <span>
-          Page<strong>{` ${pageIndex + 1} of ${pageOptions.length} `}</strong>| Go to page:
-        </span>
-
+      <div className={`d-flex align-items-center ${styles.filters}`}>
         <input
-          className={`form-control ${styles['dark-input']}`}
-          type='number'
-          defaultValue={pageIndex + 1}
-          onChange={(e) => {
-            const page = e.target.value ? Number(e.target.value) - 1 : 0
-            gotoPage(page)
-          }}
-          style={{ width: '100px' }}
+          value={titleFilter}
+          onChange={(e) => handleTitleFilterChange(e.target.value)}
+          className={`form-control w-25 ${styles['dark-input']}`}
+          placeholder='Search'
         />
 
-        <div className='btn-group'>
-          <button className={`btn ${styles['dark-input']}`} onClick={() => setPageSize(10)} disabled={pageSize === 10}>
-            {'Show 10'}
-          </button>
-          <button className={`btn ${styles['dark-input']}`} onClick={() => setPageSize(30)} disabled={pageSize === 30}>
-            {'Show 30'}
-          </button>
-          <button className={`btn ${styles['dark-input']}`} onClick={() => setPageSize(50)} disabled={pageSize === 50}>
-            {'Show 50'}
-          </button>
+        <Select
+          value={tagSelectOptions.find(x => x.value == tagFilter)}
+          options={tagSelectOptions}
+          onChange={e => handleTagFilterChange(e?.value)}
+          id='tag-select'
+          isClearable
+          placeholder='Filter by tag'
+          styles={{
+            control: (baseStyles, state) => ({
+              ...baseStyles,
+              width: '200px',
+              borderColor: 'grey',
+              backgroundColor: '#333',
+              color: 'red',
+              cursor: 'pointer',
+
+            }),
+            menu: (baseStyles, state) => ({
+              ...baseStyles,
+              width: '300px',
+              borderColor: 'grey',
+              backgroundColor: '#333',
+            }),
+            menuList: (baseStyles, state) => ({
+              ...baseStyles,
+              borderRadius: '8px'
+            }),
+            option: (baseStyles, state) => ({
+              ...baseStyles,
+              textTransform: 'capitalize',
+              cursor: 'pointer',
+            }),
+            clearIndicator: (baseStyles, state) => ({
+              ...baseStyles,
+              color: 'grey !important',
+            }),
+            indicatorSeparator: (baseStyles, state) => ({
+              ...baseStyles,
+              backgroundColor: 'grey !important',
+            }),
+            dropdownIndicator: (baseStyles, state) => ({
+              ...baseStyles,
+              color: 'grey !important',
+            }),
+            singleValue: (baseStyles, state) => ({
+              ...baseStyles,
+              color: 'white',
+              textTransform: 'capitalize',
+            }),
+          }}
+        />
+
+        <div className='form-check'>
+          <label className='form-check-label'>
+            <input
+              className={`form-check-input ${styles['dark-input']}`}
+              type='checkbox'
+              checked={showCovers}
+              onChange={(e) => handleShowCoversChange(e.target.checked)}
+            />
+            Show covers
+          </label>
         </div>
       </div>
+
+      {showCovers ? (
+        <div className='d-flex flex-wrap w-100 mt-3 justify-content-between gap-3'>
+          {data
+            .filter((x) => (titleFilter && x.title.toLowerCase().includes(titleFilter.toLowerCase())) || titleFilter === '')
+            .sort((a, b) => titleSortSimple(a.title, b.title))
+            .map((game) => {
+              return (
+                <CoverImage 
+                  game={game} 
+                  showHltb 
+                  showTags 
+                  onTagClick={handleTagFilterChange} 
+                  key={game._id} 
+                  isAdmin={isAdmin} />
+              )
+            })}
+        </div>
+      ) : (
+        <>
+          <table {...getTableProps} className={`w-100 ${styles.gameTable}`}>
+            <thead>
+              <tr>
+                {headers.map((column) => {
+                  if (column.id === '_id' && !isAdmin) return
+                  return formatHeader(column, isAdmin)
+                })}
+              </tr>
+            </thead>
+
+            <tbody {...getTableBodyProps()}>
+              {page.map((row) => {
+                prepareRow(row)
+                const rowProps = row.getRowProps()
+                return (
+                  <tr {...rowProps} key={rowProps.key}>
+                    {row.cells.map((cell) => {
+                      return formatCell(cell, row, {handleTagFilterChange})
+                    })}
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+
+          <div className='pagination d-flex align-items-center gap-2'>
+            <div className='btn-group'>
+              <button className={`btn ${styles['dark-input']}`} onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
+                {'<<'}
+              </button>
+              <button className={`btn ${styles['dark-input']}`} onClick={() => previousPage()} disabled={!canPreviousPage}>
+                {'<'}
+              </button>
+            </div>
+
+            <div className='btn-group'>
+              <button className={`btn ${styles['dark-input']}`} onClick={() => nextPage()} disabled={!canNextPage}>
+                {'>'}
+              </button>
+              <button
+                className={`btn ${styles['dark-input']}`}
+                onClick={() => gotoPage(pageCount - 1)}
+                disabled={!canNextPage}
+              >
+                {'>>'}
+              </button>
+            </div>
+
+            <span>
+              Page<strong>{` ${pageIndex + 1} of ${pageOptions.length} `}</strong>| Go to page:
+            </span>
+
+            <input
+              className={`form-control ${styles['dark-input']}`}
+              type='number'
+              defaultValue={pageIndex + 1}
+              onChange={(e) => {
+                const page = e.target.value ? Number(e.target.value) - 1 : 0
+                gotoPage(page)
+              }}
+              style={{ width: '100px' }}
+            />
+
+            <div className='btn-group'>
+              <button className={`btn ${styles['dark-input']}`} onClick={() => setPageSize(10)} disabled={pageSize === 10}>
+                {'Show 10'}
+              </button>
+              <button className={`btn ${styles['dark-input']}`} onClick={() => setPageSize(30)} disabled={pageSize === 30}>
+                {'Show 30'}
+              </button>
+              <button className={`btn ${styles['dark-input']}`} onClick={() => setPageSize(50)} disabled={pageSize === 50}>
+                {'Show 50'}
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </>
   )
 }

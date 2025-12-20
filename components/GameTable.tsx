@@ -1,64 +1,48 @@
-/* eslint-disable react/jsx-key */
+'use client'
+
 import React, { useEffect, useMemo, useState } from 'react'
-
 import { usePagination, useSortBy, useTable } from 'react-table'
-
+import Select from 'react-select'
 import styles from '../styles/GameTable.module.css'
-import { useNextQueryParams } from '../hooks/useNextQueryParams'
 import { formatCell, formatHeader } from '../utils/utils'
 import { gameTableColumns } from '../utils/columns'
+import { ReadonlyURLSearchParams } from 'next/navigation'
 
 type Props = {
   games: Array<Game>
   isAdmin: boolean
+  updateParams: (newParams: Record<string, any>) => void
+  initialParams: ReadonlyURLSearchParams
 }
 
-export const GameTable = ({ games, isAdmin }: Props) => {
-  const [showCovers, setShowCovers] = useState(true)
-  const [titleFilter, setTitleFilter] = useState('')
-  const { params, updateParams, paramsLoaded } = useNextQueryParams({
-    sortBy: 'finishedDate',
-    sortDesc: true,
-    title: '',
-  })
+export const GameTable = ({ games, updateParams, initialParams, isAdmin }: Props) => {
+  const [showCovers, setShowCovers] = useState(initialParams.get('showCovers') != 'false')
+  const [titleFilter, setTitleFilter] = useState(initialParams.get('title') ?? '')
+  const [tagFilter, setTagFilter] = useState(initialParams.get('tag') ?? null)
 
-  function manualFilter(game : Game, filter : string)
-  {
-    if(filter.startsWith("y:"))
-    {
-      let yearParse = Number.parseInt(filter.trim().substring(2))
-      if(yearParse)
-        return game.releaseYear == yearParse
-      else
-        return true;
-    }
-    else
-    {
-      return game.title.toLowerCase().includes(titleFilter.toLowerCase())
-    }
-  }
-
-  const data: Array<any> = useMemo(() => {
+  const data: Array<Partial<Game>> = useMemo(() => {
     return games
-      .filter((x) => (titleFilter && manualFilter(x, titleFilter)) || titleFilter === '')
+      .filter((x) => (tagFilter && x.tags?.includes(tagFilter)) || !tagFilter)
+      .filter((x) => (titleFilter && x.title.toLowerCase().includes(titleFilter.toLowerCase())) || titleFilter === '')
       .map((x) => {
         return {
           _id: x._id,
           title: x.title,
           finished: x.finished,
           finishedDate: x.finishedDate,
-          approximateDate: x.approximateDate,
           rating: x.rating,
           comment: x.comment,
           streamed: x.streamed,
           timeSpent: x.timeSpent,
+          additionalTimeSpent: x.additionalTimeSpent,
+          tags: x.tags,
           igdbUrl: x.igdbUrl,
           releaseYear: x.releaseYear,
           vods: x.vods,
           coverImageId: x.coverImageId,
         }
       })
-  }, [games, titleFilter])
+  }, [games, tagFilter, titleFilter])
 
   const hiddenColumns = useMemo(() => (isAdmin ? [] : ['_id']), [isAdmin])
 
@@ -76,18 +60,17 @@ export const GameTable = ({ games, isAdmin }: Props) => {
     nextPage,
     previousPage,
     setPageSize,
-    setSortBy,
     state: { pageIndex, pageSize, sortBy },
   } = useTable(
     {
-      columns: gameTableColumns as any, // This doesn't like the custom prop, casting as any will do for now
+      columns: gameTableColumns, // This doesn't like the custom prop, casting as any will do for now
       data,
       initialState: {
         hiddenColumns,
         sortBy: [
           {
-            id: 'finishedDate',
-            desc: true,
+            id: initialParams.get('sortBy') ?? 'finishedDate',
+            desc: initialParams.get('sortDesc') == 'false' ? false : true,
           },
         ],
         pageSize: 10,
@@ -99,26 +82,46 @@ export const GameTable = ({ games, isAdmin }: Props) => {
     usePagination
   )
 
-  // On load set stuff from query parameters
-  useEffect(() => {
-    if (paramsLoaded) {
-      params.title && setTitleFilter(params.title as string)
-      params.sortBy && setSortBy([{ id: params.sortBy as string, desc: params.sortDesc === 'true' ? true : false }])
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paramsLoaded])
+  const tagSelectOptions = useMemo(() => {
+    const tags: string[] = []
+
+    games.forEach(g => {
+      g.tags?.forEach(t => tags.push(t))
+    })
+    
+    // count occurrences per tag
+    const tagCounts: Record<string, number> = {}
+    tags.forEach(t => {
+      tagCounts[t] = (tagCounts[t] || 0) + 1
+    })
+
+    const uniqueTags = [...new Set(tags)].sort()
+
+    const tagOptions = uniqueTags.map(t => {
+      return { value: t, label: `${t} (${tagCounts[t] ?? 0})` }
+    })
+
+    return tagOptions
+  }, [games])
 
   const handleTitleFilterChange = (value) => {
     setTitleFilter(value)
-    updateParams({ ...params, title: value })
+    updateParams({ title: value })
+  }
+
+  const handleTagFilterChange = (value) => {
+    setTagFilter(value)
+    updateParams({ tag: value })
+  }
+
+  const handleShowCoversChange = (checked) => {
+    setShowCovers(checked)
+    updateParams({ showCovers: checked })
   }
 
   useEffect(() => {
-    if (paramsLoaded) {
-      updateParams({ ...params, sortBy: sortBy[0].id, sortDesc: sortBy[0].desc })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sortBy])
+    updateParams({ sortBy: sortBy[0].id, sortDesc: sortBy[0].desc })
+  }, [sortBy, updateParams])
 
   return (
     <>
@@ -130,13 +133,65 @@ export const GameTable = ({ games, isAdmin }: Props) => {
           placeholder='Search'
         />
 
+        <Select
+          value={tagSelectOptions.find(x => x.value == tagFilter)}
+          options={tagSelectOptions}
+          onChange={e => handleTagFilterChange(e?.value)}
+          id='tag-select'
+          isClearable
+          placeholder='Filter by tag'
+          styles={{
+            control: (baseStyles, state) => ({
+              ...baseStyles,
+              width: '200px',
+              borderColor: 'grey',
+              backgroundColor: '#333',
+              color: 'red',
+              cursor: 'pointer',
+
+            }),
+            menu: (baseStyles, state) => ({
+              ...baseStyles,
+              width: '300px',
+              borderColor: 'grey',
+              backgroundColor: '#333',
+            }),
+            menuList: (baseStyles, state) => ({
+              ...baseStyles,
+              borderRadius: '8px'
+            }),
+            option: (baseStyles, state) => ({
+              ...baseStyles,
+              textTransform: 'capitalize',
+              cursor: 'pointer',
+            }),
+            clearIndicator: (baseStyles, state) => ({
+              ...baseStyles,
+              color: 'grey !important',
+            }),
+            indicatorSeparator: (baseStyles, state) => ({
+              ...baseStyles,
+              backgroundColor: 'grey !important',
+            }),
+            dropdownIndicator: (baseStyles, state) => ({
+              ...baseStyles,
+              color: 'grey !important',
+            }),
+            singleValue: (baseStyles, state) => ({
+              ...baseStyles,
+              color: 'white',
+              textTransform: 'capitalize',
+            }),
+          }}
+        />
+
         <div className='form-check'>
           <label className='form-check-label'>
             <input
               className={`form-check-input ${styles['dark-input']}`}
               type='checkbox'
               checked={showCovers}
-              onChange={(e) => setShowCovers(e.target.checked)}
+              onChange={(e) => handleShowCoversChange(e.target.checked)}
             />
             Show covers
           </label>
@@ -146,7 +201,7 @@ export const GameTable = ({ games, isAdmin }: Props) => {
       <table {...getTableProps()} className={`w-100 ${styles.gameTable}`}>
         <thead>
           <tr>
-            {headers.map((column, i) => {
+            {headers.map((column) => {
               return formatHeader(column, isAdmin)
             })}
           </tr>
@@ -158,7 +213,7 @@ export const GameTable = ({ games, isAdmin }: Props) => {
             return (
               <tr {...row.getRowProps()} key={i}>
                 {row.cells.map((cell) => {
-                  return formatCell(cell, row, { showCovers })
+                  return formatCell(cell, row, { showCovers, handleTagFilterChange })
                 })}
               </tr>
             )
@@ -214,9 +269,8 @@ export const GameTable = ({ games, isAdmin }: Props) => {
           <button className={`btn ${styles['dark-input']}`} onClick={() => setPageSize(50)} disabled={pageSize === 50}>
             {'Show 50'}
           </button>
-		</div>
-	</div>
-	<div className='align-items-center'><br />Powered by <a href="https://github.com/TheKotti/next-backlog">Kotti's Backlog</a> script that I have butchered myself.</div>
-  </>
+        </div>
+      </div>
+    </>
   )
 }

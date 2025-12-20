@@ -1,58 +1,41 @@
+'use client'
+
 import Link from 'next/link'
-import { signIn, signOut } from 'next-auth/react'
-
-import axios from 'axios'
 import { toast } from 'react-toastify'
+import { SignIn, SignOut } from './AuthComponents'
+import { revalidateAction } from 'app/actions'
 
-type Props = {
-  isAdmin: boolean
-  username: string
+async function revalidate() {
+  var res = await revalidateAction()
+  if (res) {
+    toast.success('Revalidated')
+  } else {
+    toast.error('Revalidation failed')
+  }
 }
 
-export default function Nav(props: Props) {
-  const { isAdmin, username } = props
-
-  const refresh = () => {
-    if (isAdmin) {
-      axios
-        .get(`/api/revalidate?secret=${username}`)
-        .then(() => toast.success('Revalidated'))
-        .catch((err) => {
-          toast.error('REVALIDATION FAILED')
-        })
-    } else {
-      console.log("YOU'RE NO ADMIN")
-    }
-  }
-
+export default function Nav({ username, isAdmin }: { username: string, isAdmin: boolean }) {
   return (
-    <nav className='w-100 py-3 border-bottom d-flex justify-content-evenly align-items-center'>
-      {isAdmin ? (
-        <>
-          <button className='btn btn-light' onClick={() => signOut()}>
-            Sign out ({username})
-          </button>
+    <nav className='w-100 pb-3 mb-3 border-bottom d-flex justify-content-between align-items-center'>
+      {username ? <SignOut username={username} /> : <SignIn />}
 
+      {isAdmin && (
+        <>
           <Link href='/admin'>
-            Home
+            Game list
           </Link>
 
           <Link href='/add-game'>
             Add game
           </Link>
 
-          <Link href='/random'>
-            Random
-          </Link>
-
-          <button className='btn btn-light' onClick={() => refresh()}>
-            Refresh
+          <button
+            className='btn btn-light'
+            onClick={() => revalidate()}
+          >
+            Revalidate
           </button>
         </>
-      ) : (
-        <button className='btn btn-light' onClick={() => signIn().then(() => refresh())}>
-          Sign in as {username}
-        </button>
       )}
     </nav>
   )
