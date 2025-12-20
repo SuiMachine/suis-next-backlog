@@ -188,6 +188,7 @@ export async function addNewGameAction(formData: FormData) {
                 releaseYear,
                 igdbUrl: fetchedGame.url,
                 finishedDate: null,
+                approximateDate: false,
                 comment: "",
                 timeSpent: null,
                 finished: "",
