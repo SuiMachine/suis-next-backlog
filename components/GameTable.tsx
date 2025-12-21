@@ -30,6 +30,7 @@ export const GameTable = ({ games, updateParams, initialParams, isAdmin }: Props
           title: x.title,
           finished: x.finished,
           finishedDate: x.finishedDate,
+          approximateDate: x.approximateDate,
           rating: x.rating,
           comment: x.comment,
           streamed: x.streamed,
@@ -88,7 +89,7 @@ export const GameTable = ({ games, updateParams, initialParams, isAdmin }: Props
     games.forEach(g => {
       g.tags?.forEach(t => tags.push(t))
     })
-    
+
     // count occurrences per tag
     const tagCounts: Record<string, number> = {}
     tags.forEach(t => {

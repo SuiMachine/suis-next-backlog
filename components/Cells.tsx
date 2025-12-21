@@ -50,8 +50,14 @@ export const TagCell = ({ value, row, handleTagFilterChange }) => {
 export const DateCell = ({ value, row }) => {
   if (row.original['finished'] === 'Happening') return <span>Ongoing or soon™</span>
 
-  const formattedDate = value ? dayjs(new Date(value)).format('DD MMM YYYY') : ''
-  return <span>{formattedDate}</span>
+  if (row.original['approximateDate'] === true) {
+    const formattedDate = value ? dayjs(new Date(value)).format('YYYY') : ''
+    return <span>{"Sometime in " + formattedDate}</span>
+  }
+  else {
+    const formattedDate = value ? dayjs(new Date(value)).format('DD MMM YYYY') : ''
+    return <span>{'SD'} {formattedDate}</span>
+  }
 }
 
 export const CheckmarkCell = ({ value }) => {
@@ -115,7 +121,7 @@ export const TitleCell = ({ value, row, showCovers }) => {
 
 export const FinishedCell = ({ value, row }) => {
   const timeString = `${value}h ${row.original.additionalTimeSpent ? `+ ${row.original.additionalTimeSpent}h` : ''}`.trim()
-  if (row.original.finished === 'Nope') return <>Did not finish {`(${timeString})`}</>
+  if (row.original.finished === 'Nope' || row.original.finished === 'No') return <>Did not finish {`(${timeString})`}</>
   if (row.original.finished === 'Yes') return <>Finished {`(${timeString})`}</>
 
   const wordArray = row.original.finished.split(/(\/)/)
