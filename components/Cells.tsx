@@ -56,7 +56,7 @@ export const DateCell = ({ value, row }) => {
   }
   else {
     const formattedDate = value ? dayjs(new Date(value)).format('DD MMM YYYY') : ''
-    return <span>{'SD'} {formattedDate}</span>
+    return <span>{formattedDate}</span>
   }
 }
 
