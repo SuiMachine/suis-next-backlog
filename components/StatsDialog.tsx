@@ -106,21 +106,16 @@ export const StatsDialog = (props: Props) => {
   }, [games])
 
   const ratingCountsData = useMemo(() => {
-    const ratingCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0 }
-
-    if (games.length) {
-      games.forEach((game) => {
-        if (game.rating) {
-          ratingCounts[game.rating]++
-        }
-      })
-    }
+    const labels = Array.from({ length: 19 }, (_, i) => 1 + i * 0.5)
+    const ratingCounts = labels.map(
+      (label) => games.filter((game) => game.rating === label).length
+    )
 
     const data: ChartData<'bar'> = {
-      labels: Object.keys(ratingCounts),
+      labels,
       datasets: [
         {
-          data: Object.values(ratingCounts),
+          data: ratingCounts,
           backgroundColor: 'rgba(255, 99, 132, 0.5)',
         },
       ],

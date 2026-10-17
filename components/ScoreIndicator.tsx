@@ -28,76 +28,17 @@ export const ScoreIndicator = (props: Props) => {
 
   return (
     <div className={`${styles.wrapper}`}>
-      <div
-        className={`${styles.sector}`}
-        style={{
-          transform: 'rotate(108deg) skew(54deg)',
-          backgroundColor: rating >= options[0].value ? options[0].color : defaultBackgroundColor,
-        }}
-      ></div>
-      <div
-        className={`${styles.sector}`}
-        style={{
-          transform: 'rotate(144deg) skew(54deg)',
-          backgroundColor: rating >= options[1].value ? options[1].color : defaultBackgroundColor,
-        }}
-      ></div>
-      <div
-        className={`${styles.sector}`}
-        style={{
-          transform: 'rotate(180deg) skew(54deg)',
-          backgroundColor: rating >= options[2].value ? options[2].color : defaultBackgroundColor,
-        }}
-      ></div>
-      <div
-        className={`${styles.sector}`}
-        style={{
-          transform: 'rotate(216deg) skew(54deg)',
-          backgroundColor: rating >= options[3].value ? options[3].color : defaultBackgroundColor,
-        }}
-      ></div>
-      <div
-        className={`${styles.sector}`}
-        style={{
-          transform: 'rotate(252deg) skew(54deg)',
-          backgroundColor: rating >= options[4].value ? options[4].color : defaultBackgroundColor,
-        }}
-      ></div>
-      <div
-        className={`${styles.sector}`}
-        style={{
-          transform: 'rotate(288deg) skew(54deg)',
-          backgroundColor: rating >= options[5].value ? options[5].color : defaultBackgroundColor,
-        }}
-      ></div>
-      <div
-        className={`${styles.sector}`}
-        style={{
-          transform: 'rotate(324deg) skew(54deg)',
-          backgroundColor: rating >= options[6].value ? options[6].color : defaultBackgroundColor,
-        }}
-      ></div>
-      <div
-        className={`${styles.sector}`}
-        style={{
-          transform: 'rotate(0deg) skew(54deg)',
-          backgroundColor: rating >= options[7].value ? options[7].color : defaultBackgroundColor,
-        }}
-      ></div>
-      <div
-        className={`${styles.sector}`}
-        style={{
-          transform: 'rotate(36deg) skew(54deg)',
-          backgroundColor: rating >= options[8].value ? options[8].color : defaultBackgroundColor,
-        }}
-      ></div>
-      <div
-        className={`${styles.sector}`}
-        style={{
-          transform: 'rotate(72deg) skew(54deg)',
-          backgroundColor: rating >= options[9].value ? options[9].color : defaultBackgroundColor,
-        }}
-      ></div>
+      {Array.from({ length: 20 }, (_, k) => (
+        <div
+          key={k}
+          className={`${styles.sector}`}
+          style={{
+            transform: `rotate(${(108 + 18 * k) % 360}deg) skew(72deg)`,
+            backgroundColor:
+              rating >= (k + 1) / 2 ? options[Math.floor(k / 2)].color : defaultBackgroundColor,
+          }}
+        ></div>
+      ))}
 
       <div className={`${styles.innerCircle}`}>{rating}</div>
     </div>

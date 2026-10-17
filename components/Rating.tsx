@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import styles from '../styles/Rating.module.css'
 
@@ -22,19 +22,22 @@ type Props = {
 
 export const Rating = (props: Props) => {
   const { rating, setRating } = props
+  const [hoveredRating, setHoveredRating] = useState<number | null>(null)
+  const shownRating = hoveredRating ?? rating
 
   return (
-    <div className={styles.ratings}>
+    <div className={styles.ratings} onMouseLeave={() => setHoveredRating(null)}>
       {options.map((x) => {
+        const isHalfShown = shownRating === x.value - 0.5 && x.value > 1
         let selectStatus
         switch (true) {
-          case x.value === rating:
+          case x.value === shownRating || isHalfShown:
             selectStatus = `selectedRating ${styles.selected}`
             break
-          case rating && x.value > rating:
+          case shownRating && x.value > shownRating:
             selectStatus = styles.tooBig
             break
-          case rating === null:
+          case shownRating === null:
             selectStatus = ''
             break
 
@@ -48,8 +51,21 @@ export const Rating = (props: Props) => {
             className={`ratingBox ${styles.ratingBox} ${selectStatus}`}
             style={{ backgroundColor: x.color }}
             onClick={() => setRating(x.value)}
+            onMouseEnter={() => setHoveredRating(x.value)}
           >
-            {x.value}
+            {isHalfShown ? x.value - 0.5 : x.value}
+            {isHalfShown && <div className={styles.dimmedHalf} />}
+            {x.value > 1 && (
+              <div
+                className={styles.half}
+                onMouseEnter={() => setHoveredRating(x.value - 0.5)}
+                onMouseLeave={() => setHoveredRating(x.value)}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setRating(x.value - 0.5)
+                }}
+              />
+            )}
           </div>
         )
       })}
