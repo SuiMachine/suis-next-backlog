@@ -60,6 +60,31 @@ export async function updateGameAction(formData: FormData) {
     }
 }
 
+export async function deleteGameAction(formData: FormData) {
+    try {
+        const authState = await auth()
+        const username = authState?.user?.name ?? ""
+        const isAdmin = process.env.ADMIN_USER_NAME === username
+        if (isAdmin) {
+            const id = String(formData.get('id'))
+
+            const mongoId = new ObjectId(id)
+
+            const { db } = await connectToDatabase()
+            await db.collection('games').deleteOne({ _id: mongoId })
+
+            await revalidatePath('/')
+            await revalidatePath('/admin')
+            return true
+        }
+
+        return false
+    } catch (error) {
+        console.log('Error in delete game action:', error)
+        return false
+    }
+}
+
 export async function updateVodsAction(formData: FormData) {
     try {
         const authState = await auth()

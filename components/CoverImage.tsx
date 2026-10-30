@@ -4,6 +4,7 @@ import { Cloudinary } from '@cloudinary/url-gen'
 
 import styles from '../styles/CoverImage.module.css'
 import { ScoreIndicator } from './ScoreIndicator'
+import { RemoveGameDialog } from './RemoveGameDialog'
 import { getHltbString } from 'utils/utils'
 import { Tag } from './Tag'
 
@@ -61,7 +62,10 @@ const CoverImage = ({ game, showScore, showHltb, showTags, onTagClick, isAdmin }
         )}
 
         {isAdmin && (
-          <a href={`/recap?id=${game._id}`}>Recap</a>
+          <div className='d-flex gap-2'>
+            <a href={`/recap?id=${game._id}`}>Recap</a>
+            <RemoveGameDialog game={game} />
+          </div>
         )}
       </div>
     </div>

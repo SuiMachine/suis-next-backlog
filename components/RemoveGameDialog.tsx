@@ -1,7 +1,10 @@
-import axios from 'axios'
+'use client'
+
 import React, { useState } from 'react'
 import { Modal } from 'react-bootstrap'
+import { useRouter } from 'next/navigation'
 import { toast } from 'react-toastify'
+import { deleteGameAction } from 'app/actions'
 
 type Props = {
   game: Game
@@ -10,27 +13,24 @@ type Props = {
 export const RemoveGameDialog = (props: Props) => {
   const { game } = props
 
+  const router = useRouter()
   const [show, setShow] = useState(false)
   const [textValue, setTextValue] = useState(game.title)
 
-  const deleteGame = () => {
-     axios
-     .delete('api/games/', { data: game._id })
-     .then((_res) => {
-       toast.success('Deleted successfully 👌')
-       setTimeout(() => {
-        //An original table should be updated :-/
-        setShow(false)
-       }, 2000)
-     })
-     .catch((err) => {
-       toast.error('Delete failed')
-       console.log('ERROR: ', err)
-     })
+  const deleteGame = async () => {
+    const formData = new FormData()
+    formData.append('id', game._id!)
+    const res = await deleteGameAction(formData)
+    if (res) {
+      toast.success('Deleted successfully 👌')
+      setShow(false)
+      router.refresh()
+    } else {
+      toast.error('Delete failed')
+    }
   }
 
   return (
-    //This should probably be secured so you don't double click it - but then, I can only blamy myself
     <>
       <a href='#' onClick={() => setShow(true)}>
         Remove

@@ -2,6 +2,7 @@ import React from 'react'
 import dayjs from 'dayjs'
 
 import { VodDialog } from './VodDialog'
+import { RemoveGameDialog } from './RemoveGameDialog'
 import styles from '../styles/GameTable.module.css'
 import CoverImage from './CoverImage'
 import { Tag } from './Tag'
@@ -142,11 +143,15 @@ export const FinishedCell = ({ value, row }) => {
 }
 
 export const AdminCell = ({ value, row, showVodButton = false }) => {
+  const showRemove = row.original.comment == "";
+
   return (
     <div className={`${styles['adminCell']}`}>
       <a href={`/recap?id=${value}`}>Recap</a>
 
       {showVodButton && <VodDialog game={row.original} />}
+
+      {showRemove && <RemoveGameDialog game={row.original} />}
     </div>
   )
 }
